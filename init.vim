@@ -48,6 +48,9 @@ Plug 'airblade/vim-gitgutter'
 Plug 'luochen1990/rainbow'
 Plug 'jiangmiao/auto-pairs'
 Plug 'itchyny/lightline.vim'
+Plug 'ionide/Ionide-vim', {
+      \ 'do':  'make fsautocomplete',
+      \}
 call plug#end()
 
 let g:solarized_termcolors=256
@@ -66,4 +69,9 @@ if executable('rls')
         \ 'whitelist': ['rust'],
         \ })
 endif 
-source ~/.config/nvim/.vimrc.bepo
+
+if has('win32')
+    source ~\AppData\Local\nvim\.vimrc.bepo
+else
+    source ~/.config/nvim/.vimrc.bepo
+endif
