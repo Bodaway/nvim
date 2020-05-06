@@ -29,28 +29,42 @@ set noerrorbells          " Empeche Vim de beeper
 
 " Active le comportement 'habituel' de la touche retour en arriere
 call plug#begin('~/.config/nvim/bundle')
-Plug 'rust-lang/rust.vim'
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
-Plug 'racer-rust/vim-racer'
+
 Plug 'altercation/solarized'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
 Plug 'majutsushi/tagbar'
-"Plug 'sjbach/lusty'
-Plug 'tomtom/tcomment_vim' " gc comments
-Plug 'tpope/vim-surround'
-Plug 'milkypostman/vim-togglelist'
-Plug 'neomake/neomake', { 'for': ['rust'] }
-Plug 'airblade/vim-gitgutter'
 Plug 'luochen1990/rainbow'
 Plug 'jiangmiao/auto-pairs'
 Plug 'itchyny/lightline.vim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+
+"Plug 'prabirshrestha/async.vim'
+"Plug 'prabirshrestha/vim-lsp'
+"Plug 'prabirshrestha/asyncomplete.vim'
+"Plug 'prabirshrestha/asyncomplete-lsp.vim'
+"Plug 'sjbach/lusty'
+"Plug 'tomtom/tcomment_vim' " gc comments
+"Plug 'tpope/vim-surround'
+"Plug 'milkypostman/vim-togglelist'
+"Plug 'neomake/neomake', { 'for': ['rust'] }
+"Plug 'airblade/vim-gitgutter'
+
+"Plug for rust
+Plug 'rust-lang/rust.vim'
+Plug 'racer-rust/vim-racer'
+
+"Plug for f#
 Plug 'ionide/Ionide-vim', {
       \ 'do':  'make fsautocomplete',
       \}
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+
+
 call plug#end()
 
 let g:solarized_termcolors=256
@@ -60,15 +74,15 @@ let g:rainbow_active = 1
 
 " Activation de NERDTree au lancement de vim semble provoquer un bug avec
 " gvim, le curseur deviens invisible dans le fichier.
-"autocmd vimenter * NERDTree
+autocmd vimenter * NERDTree
 
-if executable('rls')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'rls',
-        \ 'cmd': {server_info->['rustup', 'run', 'nightly', 'rls']},
-        \ 'whitelist': ['rust'],
-        \ })
-endif 
+"if executable('rls')
+"    au User lsp_setup call lsp#register_server({
+"        \ 'name': 'rls',
+"        \ 'cmd': {server_info->['rustup', 'run', 'nightly', 'rls']},
+"        \ 'whitelist': ['rust'],
+"        \ })
+"endif 
 
 if has('win32')
     source ~\AppData\Local\nvim\.vimrc.bepo
