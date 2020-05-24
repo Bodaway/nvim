@@ -30,6 +30,7 @@ set noerrorbells          " Empeche Vim de beeper
 " Active le comportement 'habituel' de la touche retour en arriere
 call plug#begin('~/.config/nvim/bundle')
 
+Plug 'arcticicestudio/nord-vim', { 'branch': 'develop' }
 Plug 'altercation/solarized'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
@@ -37,14 +38,14 @@ Plug 'majutsushi/tagbar'
 Plug 'luochen1990/rainbow'
 Plug 'jiangmiao/auto-pairs'
 Plug 'itchyny/lightline.vim'
+
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 
-"Plug 'prabirshrestha/async.vim'
-"Plug 'prabirshrestha/vim-lsp'
-"Plug 'prabirshrestha/asyncomplete.vim'
-"Plug 'prabirshrestha/asyncomplete-lsp.vim'
-"Plug 'sjbach/lusty'
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+
+
 "Plug 'tomtom/tcomment_vim' " gc comments
 "Plug 'tpope/vim-surround'
 "Plug 'milkypostman/vim-togglelist'
@@ -68,7 +69,7 @@ Plug 'autozimu/LanguageClient-neovim', {
 call plug#end()
 
 let g:solarized_termcolors=256
-colorscheme solarized "ron
+colorscheme nord "ron
 
 let g:rainbow_active = 1
 

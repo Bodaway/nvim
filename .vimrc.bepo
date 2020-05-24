@@ -78,6 +78,12 @@ noremap wp <C-w>o
 noremap w<SPACE> :split<CR>
 noremap w<CR> :vsplit<CR>
 
+" colorise les nbsp
+highlight NbSp ctermbg=lightgray guibg=lightred
+match NbSp /\%xa0/
+set listchars=nbsp:¤,tab:>-,trail:¤,extends:>,precedes:<
+set list
+
 " The-NERD-tree
 let NERDTreeMapActivateNode=',e'
 let NERDTreeMapOpenInTab=',t' 
