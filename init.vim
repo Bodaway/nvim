@@ -1,5 +1,10 @@
+syntax enable
+filetype plugin on
 
 set background=dark
+set path+=**
+set wildmenu
+set wildignore+=**/node_modules/**
 
 " The following are commented out as they cause vim to behave a lot
 " differently from regular Vi. They are highly recommended though.
@@ -14,6 +19,10 @@ set title
 set number
 set ruler
 set wrap
+set expandtab
+set shiftwidth=4
+set softtabstop=4
+
 "set scrolloff=3
 " -- Recherche
 set ignorecase            " Ignore la casse lors d'une recherche
@@ -27,63 +36,99 @@ set hlsearch              " Surligne les resultats de recherche
 set visualbell            " Empeche Vim de beeper
 set noerrorbells          " Empeche Vim de beeper
 
-" Active le comportement 'habituel' de la touche retour en arriere
+" Reload a file when it is changed from the outside
+set autoread
+
+" Write the file when we leave the buffer
+set autowrite
+
+" Disable backups, we have source control for that
+set nobackup
+
+" Force encoding to utf-8, for systems where this is not the default
+set encoding=utf-8
+
+" Disable swapfiles too
+set noswapfile
+
+" Hide buffers instead of closing them
+set hidden
+
+""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plugins
+""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" TODO: At some point I'll need to switch over to the native Vim 8.0 package
+" feature. Either via manual git subtree management, or maybe through minpac?
+"
+" Install vim-plug if we don't already have it
+" Credit to github.com/captbaritone
+"if empty(glob("~/.vim/autoload/plug.vim"))
+" Ensure all needed directories exist  (Thanks @kapadiamush)
+"    execute 'mkdir -p ~/.vim/plugged'
+"    execute 'mkdir -p ~/.vim/autoload'
+" Download the actual plugin manager
+"    execute '!curl -fLo ~/.vim/autoload/plug.vim https://raw.github.com/junegunn/vim-plug/master/plug.vim'
+"endif
+
 call plug#begin('~/.config/nvim/bundle')
 
 Plug 'arcticicestudio/nord-vim', { 'branch': 'develop' }
 Plug 'altercation/solarized'
-Plug 'tpope/vim-fugitive'
+Plug 'itchyny/lightline.vim'
+
+" Bag of mappings
+Plug 'tpope/vim-surround'
+"Plug 'tpope/vim-repeat'
+"Plug 'tpope/vim-unimpaired'
+Plug 'scrooloose/nerdcommenter'
+"Plug 'romainl/vim-qf'
+
+"Plug 'honza/vim-snippets'
+
+" Navigation
+"Plug 'tpope/vim-vinegar'
+"Plug 'ctrlpvim/ctrlp.vim' " TODO: I don't really use that anymore.
+"Plug 'mileszs/ack.vim'
+
+" Theming
+"Plug 'vim-airline/vim-airline'
+"Plug 'vim-airline/vim-airline-themes'
+
+" Tag management
+"Plug 'ludovicchabant/vim-gutentags'
+
 Plug 'scrooloose/nerdtree'
 Plug 'majutsushi/tagbar'
 Plug 'luochen1990/rainbow'
 Plug 'jiangmiao/auto-pairs'
-Plug 'itchyny/lightline.vim'
 
+" 'IDE' features
+Plug 'tpope/vim-fugitive'
+"Plug 'tpope/vim-dispatch'
+"Plug 'janko/vim-test'
+"Plug 'pangloss/vim-javascript'    " JavaScript support
+"Plug 'leafgarland/typescript-vim' " TypeScript syntax
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-
-Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
-
-
-"Plug 'tomtom/tcomment_vim' " gc comments
-"Plug 'tpope/vim-surround'
-"Plug 'milkypostman/vim-togglelist'
-"Plug 'neomake/neomake', { 'for': ['rust'] }
-"Plug 'airblade/vim-gitgutter'
-
-"Plug for rust
-Plug 'rust-lang/rust.vim'
-Plug 'racer-rust/vim-racer'
-
-"Plug for f#
-Plug 'ionide/Ionide-vim', {
-      \ 'do':  'make fsautocomplete',
-      \}
-Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-
+Plug 'mattn/emmet-vim'
+Plug 'OmniSharp/omnisharp-vim'
 
 call plug#end()
 
+" CoC extensions
+if has('win32')
+    source ~\AppData\Local\nvim\.vimrc.coc
+else
+    source ~/.config/nvim/.vimrc.coc
+endif
+
 let g:solarized_termcolors=256
 colorscheme nord "ron
-
 let g:rainbow_active = 1
 
-" Activation de NERDTree au lancement de vim semble provoquer un bug avec
-" gvim, le curseur deviens invisible dans le fichier.
-autocmd vimenter * NERDTree
 
-"if executable('rls')
-"    au User lsp_setup call lsp#register_server({
-"        \ 'name': 'rls',
-"        \ 'cmd': {server_info->['rustup', 'run', 'nightly', 'rls']},
-"        \ 'whitelist': ['rust'],
-"        \ })
-"endif 
+let mapleader = "ê"
+
 
 if has('win32')
     source ~\AppData\Local\nvim\.vimrc.bepo
