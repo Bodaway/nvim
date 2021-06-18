@@ -34,11 +34,6 @@ noremap zt zk
 inoremap « <
 inoremap » >
 
-" On remappe le ; vers , pour faciliter le C#
-inoremap ; ,
-inoremap , ;
-inoremap ’’ <Esc>
-
 
 " {HJKL} <- [CTSR]
 " ————————————————
