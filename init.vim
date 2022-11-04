@@ -141,8 +141,10 @@ Plug 'maximbaz/lightline-ale'
 
 " Snippet support
 "if s:using_snippets
-  Plug 'sirver/ultisnips'
+  "Plug 'sirver/ultisnips'
 "endif
+
+Plug 'carlsmedstad/vim-bicep'
 
 call plug#end()
 

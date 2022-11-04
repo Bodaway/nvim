@@ -52,33 +52,34 @@ autocmd FileType cs nnoremap <leader>t :OmniSharpTypeLookup<CR>
 autocmd FileType cs nnoremap <leader>f :OmniSharpCodeFormat<CR>
 
 set completeopt=menuone,noinsert,noselect,preview
-let g:asyncomplete_auto_popup = 1
+let g:asyncomplete_auto_popup = 0
 let g:asyncomplete_auto_completeopt = 0
 let g:asyncomplete_force_refresh_on_context_changed = 1
 let g:omnicomplete_fetch_full_documentation = 1
 
+let g:OmniSharp_server_use_net6 = 1
 let g:OmniSharp_server_stdio = 1
 let g:OmniSharp_highlight_types = 2
 let g:OmniSharp_typeLookupInPreview = 1
 
-let g:OmniSharp_popup_position = 'peek'
-if has('nvim')
-  let g:OmniSharp_popup_options = {
-  \ 'winhl': 'Normal:NormalFloat'
-  \}
-else
-  let g:OmniSharp_popup_options = {
-  \ 'highlight': 'Normal',
-  \ 'padding': [0, 0, 0, 0],
-  \ 'border': [1]
-  \}
-endif
-let g:OmniSharp_popup_mappings = {
-\ 'sigNext': '<C-n>',
-\ 'sigPrev': '<C-p>',
-\ 'pageDown': ['<C-f>', '<PageDown>'],
-\ 'pageUp': ['<C-b>', '<PageUp>']
-\}
+"let g:OmniSharp_popup_position = 'peek'
+"if has('nvim')
+  "let g:OmniSharp_popup_options = {
+  "\ 'winhl': 'Normal:NormalFloat'
+  "\}
+"else
+  "let g:OmniSharp_popup_options = {
+  "\ 'highlight': 'Normal',
+  "\ 'padding': [0, 0, 0, 0],
+  "\ 'border': [1]
+  "\}
+"endif
+"let g:OmniSharp_popup_mappings = {
+"\ 'sigNext': '<C-n>',
+"\ 'sigPrev': '<C-p>',
+"\ 'pageDown': ['<C-f>', '<PageDown>'],
+"\ 'pageUp': ['<C-b>', '<PageUp>']
+"\}
 
 if s:using_snippets
   let g:OmniSharp_want_snippet = 1
