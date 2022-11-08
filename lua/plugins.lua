@@ -1,3 +1,4 @@
+vim.g.mapleader = '$'
 require('packer').startup(function(use)
     -- Packer can manage itself
     use 'wbthomason/packer.nvim'
@@ -15,7 +16,39 @@ require('packer').startup(function(use)
                     'hrsh7th/cmp-nvim-lua', 'octaltree/cmp-look', 'hrsh7th/cmp-path', 'hrsh7th/cmp-calc',
                     'f3fora/cmp-spell', 'hrsh7th/cmp-emoji'}
     }
+    use {
+        'nvim-telescope/telescope.nvim',
+        requires = {{'nvim-lua/plenary.nvim'}}
+    }
+    use {
+        'nvim-lualine/lualine.nvim',
+        requires = {
+            'kyazdani42/nvim-web-devicons',
+            opt = true
+        }
+    }
+
+    use {'tpope/vim-fugitive'}
+    use {
+        'junegunn/gv.vim',
+        opt = true,
+        cmd = {'GV'}
+    } -- Git log graphical visualisation
+    use 'arkav/lualine-lsp-progress'
+
+    use('tpope/vim-repeat')
+
+    use { -- gitsigns.nvim
+    'lewis6991/gitsigns.nvim'}
+    use {
+        "akinsho/toggleterm.nvim",
+        tag = '*'
+    }
+
 end)
+
+require("toggleterm").setup()
+require('gitsigns').setup()
 
 require("mason").setup()
 vim.cmd [[colorscheme nord]]
@@ -85,18 +118,51 @@ lspconfig['tsserver'].setup {
     on_attach = on_attach,
     flags = lsp_flags
 }
+
+vim.cmd [[ autocmd BufNewFile,BufRead *.bicep set filetype=bicep ]]
+local bicep_lsp_bin =
+    "C:\\Users\\MichelBonenfant\\AppData\\Local\\nvim-data\\mason\\packages\\bicep-lsp\\bicepLanguageServer\\Bicep.LangServer.dll"
+lspconfig['bicep'].setup {
+    cmd = {"dotnet", bicep_lsp_bin},
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = lsp_flags
+}
 local configOmnisharp = {
     handlers = {
         ["textDocument/definition"] = require('omnisharp_extended').handler
     },
-    cmd = {'dotnet',omnisharp_bin},
+    cmd = {'dotnet', omnisharp_bin},
     capabilities = capabilities,
-    on_attach = on_attach,
-    --useModernNet = true
+    on_attach = on_attach
+    -- useModernNet = true
     -- enable_roslyn_analyzers = true,
     -- analyze_open_documents_only = false
 }
 lspconfig['omnisharp'].setup(configOmnisharp)
+
+vim.cmd [[ autocmd BufNewFile,BufRead *.azcli set filetype=sh ]]
+lspconfig['bashls'].setup {
+    filetypes = {"sh", "azcli"},
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = lsp_flags
+}
+lspconfig['luau_lsp'].setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = lsp_flags
+}
+lspconfig['sqlls'].setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = lsp_flags
+}
+lspconfig['yamlls'].setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = lsp_flags
+}
 
 -- luasnip setup
 local luasnip = require 'luasnip'
@@ -142,6 +208,20 @@ cmp.setup {
         name = 'luasnip'
     }}
 }
+
+-- Telescope
+local baseTelescope = require('telescope').setup {
+    defaults = {
+        file_ignore_patterns = {'node_modules', 'bin', 'obj'}
+    }
+}
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
+require('line')
 
 -- local on_windows = vim.loop.os_uname().version:match 'Windows'
 
