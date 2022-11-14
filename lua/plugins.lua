@@ -1,3 +1,27 @@
+local on_windows = vim.loop.os_uname().version:match 'Windows'
+
+local omnisharp_bin
+local bicep_lsp_bin
+local netcoredbg_path
+
+if on_windows then
+    omnisharp_bin = 'C:\\Users\\MichelBonenfant\\AppData\\Local\\nvim-data\\mason\\packages\\omnisharp\\OmniSharp.dll'
+    bicep_lsp_bin =
+        "C:\\Users\\MichelBonenfant\\AppData\\Local\\nvim-data\\mason\\packages\\bicep-lsp\\bicepLanguageServer\\Bicep.LangServer.dll"
+
+else
+    omnisharp_bin = '/home/bod/.local/share/nvim/mason/packages/omnisharp/OmniSharp.dll'
+    netcoredbg_path = '/home/bod/.local/share/nvim/mason/packages/omnisharp'
+    bicep_lsp_bin = "/home/bod/.local/share/nvim/mason/packages/bicep_lsp/bicepLanguageServer/Bicep.LangServer.dll"
+end
+
+-- disable netrw at the very start of your init.lua (strongly advised)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- set termguicolors to enable highlight groups
+vim.opt.termguicolors = true
+
 vim.g.mapleader = '$'
 require('packer').startup(function(use)
     -- Packer can manage itself
@@ -28,6 +52,11 @@ require('packer').startup(function(use)
         }
     }
 
+    use {
+        "kyoz/purify",
+        run = 'vim'
+    }
+
     use {'tpope/vim-fugitive'}
     use {
         'junegunn/gv.vim',
@@ -44,14 +73,92 @@ require('packer').startup(function(use)
         "akinsho/toggleterm.nvim",
         tag = '*'
     }
+    use {
+        "folke/trouble.nvim",
+        requires = {"kyazdani42/nvim-web-devicons"}
+    }
+
+    use {
+        'mfussenegger/nvim-dap',
+        requires = {'rcarriga/nvim-dap-ui', 'theHamsta/nvim-dap-virtual-text'}
+    }
+
+    use 'ravenxrz/DAPInstall.nvim'
+    use {
+        'nvim-tree/nvim-tree.lua',
+        requires = {'nvim-tree/nvim-web-devicons' -- optional, for file icons
+        },
+        tag = 'nightly' -- optional, updated every week. (see issue #1193)
+    }
+
+    use {
+        "glepnir/lspsaga.nvim",
+        branch = "main"
+    }
+    use "ray-x/lsp_signature.nvim"
+
+    use {
+        'nvim-treesitter/nvim-treesitter',
+        run = function()
+            local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
+            ts_update()
+        end,
+    }
 
 end)
 
 require("toggleterm").setup()
 require('gitsigns').setup()
+require("trouble").setup {
+    position = "bottom", -- position of the list can be: bottom, top, left, right
+    height = 10, -- height of the trouble list when position is top or bottom
+    width = 50, -- width of the list when position is left or right
+    icons = true, -- use devicons for filenames
+    mode = "workspace_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
+    fold_open = "", -- icon used for open folds
+    fold_closed = "", -- icon used for closed folds
+    group = true, -- group results by file
+    padding = true, -- add an extra new line on top of the list
+    action_keys = { -- key mappings for actions in the trouble list
+        -- map to {} to remove a mapping, for example:
+        -- close = {},
+        close = "q", -- close the list
+        cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
+        refresh = "r", -- manually refresh
+        jump = {"<cr>", "<tab>"}, -- jump to the diagnostic or open / close folds
+        open_split = {"<c-x>"}, -- open buffer in new split
+        open_vsplit = {"<c-v>"}, -- open buffer in new vsplit
+        open_tab = {"<c-t>"}, -- open buffer in new tab
+        jump_close = {"o"}, -- jump to the diagnostic and close the list
+        toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
+        toggle_preview = "P", -- toggle auto_preview
+        hover = "K", -- opens a small popup with the full multiline message
+        preview = "p", -- preview the diagnostic location
+        close_folds = {"zM", "zm"}, -- close all folds
+        open_folds = {"zR", "zr"}, -- open all folds
+        toggle_fold = {"zA", "za"}, -- toggle fold of current file
+        previous = "k", -- previous item
+        next = "j" -- next item
+    },
+    indent_lines = true, -- add an indent guide below the fold icons
+    auto_open = false, -- automatically open the list when you have diagnostics
+    auto_close = false, -- automatically close the list when you have no diagnostics
+    auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
+    auto_fold = false, -- automatically fold a file trouble list at creation
+    auto_jump = {"lsp_definitions"}, -- for the given modes, automatically jump if there is only a single result
+    signs = {
+        -- icons / text used for a diagnostic
+        error = "",
+        warning = "",
+        hint = "",
+        information = "",
+        other = "﫠"
+    },
+    use_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
+}
 
 require("mason").setup()
-vim.cmd [[colorscheme nord]]
+vim.cmd [[colorscheme purify]]
 
 vim.lsp.set_log_level 'debug'
 require('vim.lsp.log').set_format_func(vim.inspect)
@@ -107,7 +214,6 @@ local lsp_flags = {
 }
 
 local pid = vim.fn.getpid()
-local omnisharp_bin = 'C:\\Users\\MichelBonenfant\\AppData\\Local\\nvim-data\\mason\\packages\\omnisharp\\OmniSharp.dll'
 
 -- Add additional capabilities supported by nvim-cmp
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -120,13 +226,12 @@ lspconfig['tsserver'].setup {
 }
 
 vim.cmd [[ autocmd BufNewFile,BufRead *.bicep set filetype=bicep ]]
-local bicep_lsp_bin =
-    "C:\\Users\\MichelBonenfant\\AppData\\Local\\nvim-data\\mason\\packages\\bicep-lsp\\bicepLanguageServer\\Bicep.LangServer.dll"
 lspconfig['bicep'].setup {
     cmd = {"dotnet", bicep_lsp_bin},
     capabilities = capabilities,
     on_attach = on_attach,
-    flags = lsp_flags
+    flags = lsp_flags, 
+    require "lsp_signature".on_attach({}, bufnr),
 }
 local configOmnisharp = {
     handlers = {
@@ -159,6 +264,11 @@ lspconfig['sqlls'].setup {
     flags = lsp_flags
 }
 lspconfig['yamlls'].setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    flags = lsp_flags
+}
+lspconfig['sumneko_lua'].setup {
     capabilities = capabilities,
     on_attach = on_attach,
     flags = lsp_flags
@@ -222,6 +332,177 @@ vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
 require('line')
+
+local dap, dapui, dap_virtual_text = require('dap'), require('dapui'), require('nvim-dap-virtual-text')
+
+dapui.setup {}
+
+dap.listeners.after.event_initialized['dapui_config'] = function()
+    dapui.open()
+end
+dap.listeners.before.event_terminated['dapui_config'] = function()
+    dapui.close()
+end
+dap.listeners.before.event_exited['dapui_config'] = function()
+    dapui.close()
+end
+
+local dap_install = require("dap-install")
+
+dap_install.setup({
+    installation_path = "/home/bod/.local/share/nvim/dapinstall/"
+})
+dap_install.config("dnetcs")
+
+dap_virtual_text.setup()
+
+-- require('keymaps').dap()
+
+dap.adapters.coreclr = {
+    type = 'executable',
+    command = netcoredbg_path,
+    args = {'--interpreter=vscode'}
+}
+
+dap.configurations.cs = {{
+    type = "coreclr",
+    name = "launch - netcoredbg",
+    request = "launch",
+    program = function()
+        return vim.fn.input('Path to dll', vim.fn.getcwd() .. '/bin/Debug/', 'file')
+    end
+}}
+
+vim.fn.sign_define('DapBreakpoint', {
+    text = '',
+    texthl = 'DiagnosticDefaultError'
+})
+vim.fn.sign_define('DapBreakpointCondition', {
+    text = '',
+    texthl = 'DiagnosticDefaultError'
+})
+require("dapui").setup()
+
+-- empty setup using defaults
+require("nvim-tree").setup()
+
+-- OR setup with some options
+require("nvim-tree").setup({
+    sort_by = "case_sensitive",
+    open_on_setup = true,
+    view = {
+        adaptive_size = true,
+        mappings = {
+            list = {{
+                key = "u",
+                action = "dir_up"
+            }}
+        }
+    },
+    renderer = {
+        group_empty = true
+    },
+    filters = {
+        dotfiles = true
+    }
+})
+
+local keymap = vim.keymap.set
+local saga = require('lspsaga')
+
+saga.init_lsp_saga()
+
+-- Lsp finder find the symbol definition implement reference
+-- if there is no implement it will hide
+-- when you use action in finder like open vsplit then you can
+-- use <C-t> to jump back
+keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", {
+    silent = true
+})
+
+-- Code action
+keymap({"n", "v"}, "<leader>ca", "<cmd>Lspsaga code_action<CR>", {
+    silent = true
+})
+
+-- Rename
+keymap("n", "gr", "<cmd>Lspsaga rename<CR>", {
+    silent = true
+})
+
+-- Peek Definition
+-- you can edit the definition file in this flaotwindow
+-- also support open/vsplit/etc operation check definition_action_keys
+-- support tagstack C-t jump back
+keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>", {
+    silent = true
+})
+
+-- Show line diagnostics
+keymap("n", "<leader>cd", "<cmd>Lspsaga show_line_diagnostics<CR>", {
+    silent = true
+})
+
+-- Show cursor diagnostic
+keymap("n", "<leader>cd", "<cmd>Lspsaga show_cursor_diagnostics<CR>", {
+    silent = true
+})
+
+-- Diagnsotic jump can use `<c-o>` to jump back
+keymap("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", {
+    silent = true
+})
+keymap("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", {
+    silent = true
+})
+
+-- Only jump to error
+keymap("n", "[E", function()
+    require("lspsaga.diagnostic").goto_prev({
+        severity = vim.diagnostic.severity.ERROR
+    })
+end, {
+    silent = true
+})
+keymap("n", "]E", function()
+    require("lspsaga.diagnostic").goto_next({
+        severity = vim.diagnostic.severity.ERROR
+    })
+end, {
+    silent = true
+})
+
+-- Outline
+keymap("n", "<leader>o", "<cmd>LSoutlineToggle<CR>", {
+    silent = true
+})
+
+-- Hover Doc
+keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", {
+    silent = true
+})
+
+-- Float terminal
+keymap("n", "<A-d>", "<cmd>Lspsaga open_floaterm<CR>", {
+    silent = true
+})
+-- if you want pass somc cli command into terminal you can do like this
+-- open lazygit in lspsaga float terminal
+keymap("n", "<A-d>", "<cmd>Lspsaga open_floaterm lazygit<CR>", {
+    silent = true
+})
+-- close floaterm
+keymap("t", "<A-d>", [[<C-\><C-n><cmd>Lspsaga close_floaterm<CR>]], {
+    silent = true
+})
+
+require'lsp_signature'.setup() 
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = { "lua", "c_sharp","bash","typescript" },
+    auto_install = true,
+}
 
 -- local on_windows = vim.loop.os_uname().version:match 'Windows'
 
