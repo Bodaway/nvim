@@ -15,7 +15,8 @@ else
     bicep_lsp_bin = "/home/bod/.local/share/nvim/mason/packages/bicep_lsp/bicepLanguageServer/Bicep.LangServer.dll"
 end
 
-vim.cmd [[colorscheme purify]]
+vim.cmd [[colorscheme nvcode]]
+--vim.cmd [[colorscheme meadow-nvim]]
 -- disable netrw at the very start of your init.lua (strongly advised)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -25,16 +26,16 @@ vim.opt.termguicolors = true
 
 vim.g.mapleader = '$'
 
-
-
 require('packer').startup(function(use)
     -- Packer can manage itself
     use 'wbthomason/packer.nvim'
 
     use {'scrooloose/nerdtree'}
 
-    use {'williamboman/mason.nvim'}
+    use {'williamboman/mason.nvim', "williamboman/mason-lspconfig.nvim"}
     use 'shaunsingh/nord.nvim'
+    use 'christianchiarulli/nvcode-color-schemes.vim'
+    use 'kuznetsss/meadow-nvim'
     use 'neovim/nvim-lspconfig'
     use 'Hoffs/omnisharp-extended-lsp.nvim'
 
@@ -73,14 +74,14 @@ require('packer').startup(function(use)
 
     use { -- gitsigns.nvim
     'lewis6991/gitsigns.nvim'}
-    use {
-        "akinsho/toggleterm.nvim",
-        tag = '*'
-    }
-    use {
-        "folke/trouble.nvim",
-        requires = {"kyazdani42/nvim-web-devicons"}
-    }
+    --use {
+    --     "akinsho/toggleterm.nvim",
+    --     tag = '*'
+    -- }
+    -- use {
+    --     "folke/trouble.nvim",
+    --     requires = {"kyazdani42/nvim-web-devicons"}
+    -- }
 
     use {
         'mfussenegger/nvim-dap',
@@ -95,25 +96,45 @@ require('packer').startup(function(use)
         tag = 'nightly' -- optional, updated every week. (see issue #1193)
     }
 
-    use {
+    use({
         "glepnir/lspsaga.nvim",
-        branch = "main"
-    }
+        branch = "main",
+        config = function()
+            require("lspsaga").setup({})
+        end,
+        requires = {{"nvim-tree/nvim-web-devicons"}}
+    })
     use "ray-x/lsp_signature.nvim"
 
     use {
         'nvim-treesitter/nvim-treesitter',
         run = function()
-            local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
+            local ts_update = require('nvim-treesitter.install').update({
+                with_sync = true
+            })
             ts_update()
-        end,
+        end
     }
+    use {"windwp/nvim-autopairs"}
+    use {'norcalli/nvim-colorizer.lua'}
+    use 'nvim-tree/nvim-web-devicons'
+
+    use 'mfussenegger/nvim-treehopper'
+    -- use 'sheerun/vim-polyglot'
 
 end)
 
-require("toggleterm").setup()
+require('nvim-web-devicons').setup()
+-- require("toggleterm").setup({
+--     open_mapping = [[<c-t>]],
+--     direction = "horizontal", -- vertical | horizontal | tab | float
+--     persist_mode = true
+-- })
+
 require('gitsigns').setup()
 require("mason").setup()
+require("nvim-autopairs").setup {}
+require('colorizer').setup()
 require('mylspconfig')
 -- luasnip setup
 local luasnip = require 'luasnip'
@@ -122,7 +143,26 @@ require('mytelescope')
 require('line')
 require('mydap')
 require('saga')
-require'lsp_signature'.setup() 
+require'lsp_signature'.setup()
 require('treesitter')
 require('tree')
-require('mytrouble')
+--require('mytrouble')
+
+-- vim.g.nord_italic = false
+-- require('nord').set()
+
+require'meadow'.setup {
+    -- Available options and default values
+    color_saturation = 80, -- colors contrast, can be from 0 to 100
+    color_value = 80, -- colors brightness, can be from 0 to 100
+    indentblankline_colors = true, -- set colors for indent-blankline
+    signify_colors = true, -- set colors for signify
+    lspsaga_colors = true, -- set colors for lspsaga
+    telescope_colors = true, -- set colors for telescope
+    spelunker_colors = true, -- set colors for spelunker
+    fixed_line_colors = true -- set colors for fixed_line
+}
+
+vim.cmd [[omap     <silent> m :<C-U>lua require('tsht').nodes()<CR>]]
+vim.cmd [[xnoremap <silent> m :lua require('tsht').nodes()<CR>]]
+

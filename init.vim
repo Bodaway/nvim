@@ -62,5 +62,5 @@ else
     source ~/.config/nvim/.vimrc.bepo
 endif
 
-lua require('plugins')
 inoremap <C-x><C-o> <Cmd>lua require('cmp').complete()<CR>
+lua require('plugins')
